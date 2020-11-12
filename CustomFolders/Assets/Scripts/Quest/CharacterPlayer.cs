@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using GameAnalyticsSDK.Setup;
 using UnityEngine;
 
@@ -7,6 +9,8 @@ public class CharacterPlayer : MonoBehaviour
 {
     [SerializeField] private CharacterButton baseButton;
     private CharacterConfig config;
+
+    private GameObject _chosenPrefab;
     private void Start()
     {
         config = Resources.Load<CharacterConfig>("CharacterConfig");
@@ -14,11 +18,11 @@ public class CharacterPlayer : MonoBehaviour
         foreach (var objName in names)
         {
             var btn = Instantiate(baseButton, transform);
-            btn.Setup(objName, OnEffectButton);
+            btn.Setup(objName, OnCharacterButton);
         }
     }
 
-    private void OnEffectButton(string id)
+    private void OnCharacterButton(string id)
     {
         foreach (var i in config.CharacterType)
         {
@@ -27,6 +31,57 @@ public class CharacterPlayer : MonoBehaviour
                 Destroy(item);
         }
         var asset = config.GetCharacter(id);
-        Instantiate(asset, Vector3.zero, new Quaternion(0f,180f,0f, 0f));
+        _chosenPrefab = Instantiate(asset, Vector3.zero, new Quaternion(0f,180f,0f, 0f));
+        
+        SkinsButtons(id);
+    }
+
+    private void OnSkinButton(string id)
+    {
+        string type = "";
+
+        for (int i = 0; i < id.Length; i++)
+        {
+            if (id[i] == '_')
+                break;
+            type += id[i];
+        }
+
+        var directoryInfo = new DirectoryInfo(Application.streamingAssetsPath + "/Skins/" + type);
+        print($"Streaming path: {Application.streamingAssetsPath}");
+
+        var skins = directoryInfo.GetFiles("*.*");
+        var f = skins.FirstOrDefault(s => s.FullName.Contains(id) && !s.FullName.Contains("meta"));
+        
+        var bytes = File.ReadAllBytes(f.FullName);
+        var texture2d = new Texture2D(1,1);
+        texture2d.LoadImage(bytes);
+
+        string skinType = "";
+        for (int i = 0; i < f.FullName.Length; i++)
+        {
+            if (f.FullName.Contains("_"))
+            {
+                skinType += f.FullName[i];
+            }
+        }
+        Debug.Log(skinType);
+    }
+    private void SkinsButtons(string id)
+    {
+        var directoryInfo = new DirectoryInfo(Application.streamingAssetsPath + "/Skins/" + id);
+        print($"Streaming path: {Application.streamingAssetsPath}");
+
+        var skins = directoryInfo.GetFiles("*.*");
+        foreach (var f in skins)
+        {
+            Debug.Log($"File name {f}");
+
+            if (f.Name.Contains("meta"))
+                continue;
+
+            var btn = Instantiate(baseButton, transform);
+            btn.Setup(f.Name, OnSkinButton);
+        }
     }
 }
