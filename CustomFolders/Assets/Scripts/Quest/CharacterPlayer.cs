@@ -38,16 +38,9 @@ public class CharacterPlayer : MonoBehaviour
 
     private void OnSkinButton(string id)
     {
-        string type = "";
+        var skinTypes = id.Split('_');
 
-        for (int i = 0; i < id.Length; i++)
-        {
-            if (id[i] == '_')
-                break;
-            type += id[i];
-        }
-
-        var directoryInfo = new DirectoryInfo(Application.streamingAssetsPath + "/Skins/" + type);
+        var directoryInfo = new DirectoryInfo(Application.streamingAssetsPath + "/Skins/" + skinTypes[0]);
         print($"Streaming path: {Application.streamingAssetsPath}");
 
         var skins = directoryInfo.GetFiles("*.*");
@@ -57,15 +50,8 @@ public class CharacterPlayer : MonoBehaviour
         var texture2d = new Texture2D(1,1);
         texture2d.LoadImage(bytes);
 
-        string skinType = "";
-        for (int i = 0; i < f.FullName.Length; i++)
-        {
-            if (f.FullName.Contains("_"))
-            {
-                skinType += f.FullName[i];
-            }
-        }
-        Debug.Log(skinType);
+        
+        
     }
     private void SkinsButtons(string id)
     {
