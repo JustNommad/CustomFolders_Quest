@@ -46,9 +46,7 @@ public class CharacterPlayer : MonoBehaviour
         var skins = directoryInfo.GetFiles("*.*");
         var f = skins.FirstOrDefault(s => s.FullName.Contains(id) && !s.FullName.Contains("meta"));
         
-        var bytes = File.ReadAllBytes(f.FullName);
-        var texture2d = new Texture2D(1,1);
-        texture2d.LoadImage(bytes);
+        var texture2d = TGALoader.LoadTGA(f.FullName);
 
         var prefabSkin = _chosenPrefab.GetComponentsInChildren<SkinnedMeshRenderer>()
         .FirstOrDefault(s => s.name.Contains(skinTypes[1]));
