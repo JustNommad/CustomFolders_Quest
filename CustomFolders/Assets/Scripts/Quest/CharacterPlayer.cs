@@ -50,8 +50,9 @@ public class CharacterPlayer : MonoBehaviour
         var texture2d = new Texture2D(1,1);
         texture2d.LoadImage(bytes);
 
-        
-        
+        var prefabSkin = _chosenPrefab.GetComponentsInChildren<SkinnedMeshRenderer>()
+        .FirstOrDefault(s => s.name.Contains(skinTypes[1]));
+        prefabSkin.sharedMaterial.mainTexture = texture2d;
     }
     private void SkinsButtons(string id)
     {
